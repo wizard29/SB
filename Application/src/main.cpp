@@ -16,7 +16,7 @@
 
 
 //------------------------------------------------------------------------------
-#include <qapplication.h>
+#include <SBCoreApplication.h>
 
 
 //------------------------------------------------------------------------------
@@ -28,7 +28,7 @@
  */
 int main(int argc, char** argv)
 {
-    QApplication app(argc, argv);
+    SBCoreApplication app(argc, argv);
     return app.exec();
 }
 //------------------------------------------------------------------------------
