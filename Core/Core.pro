@@ -12,9 +12,14 @@ TEMPLATE = lib
 DEFINES += CORE_BUILD
 
 ################################################################################
-HEADERS +=
+HEADERS += \
+    include/coredef.h \
+    include/SBCoreApplication.h \
+    src/private/SBCoreApplication_p.h
 
 ################################################################################
-SOURCES +=
+SOURCES += \
+    src/SBCoreApplication.cpp \
+    src/private/SBCoreApplication_p.cpp
 
 ################################################################################
