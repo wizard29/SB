@@ -3,9 +3,9 @@
 //==============================================================================
 //
 // Author:              $Author:$
-// Creation date:       2015.03.04
+// Creation date:       2015.03.07
 // Modification date:   $Date$
-// Module:              Application
+// Module:              Gui
 // Platform:            MS Windows 7, Linux, MAC OS X 10.6.x
 //
 //------------------------------------------------------------------------------
@@ -16,21 +16,28 @@
 
 
 //------------------------------------------------------------------------------
-#include <SBApplication.h>
+#ifndef SBMDIMANAGER_H
+#define SBMDIMANAGER_H
 
 
-//------------------------------------------------------------------------------
-/**
- * @brief The application entry point.
- * @param argc - an application argument count.
- * @param argv - an application argument list.
- * @return 0 if the application completes successfully.
- */
-int main(int argc, char** argv)
+#include <guidef.h>
+#include <qobject.h>
+
+
+class GUI_DEF SBMDIManager
+        : public QObject
 {
-    SBApplication app(argc, argv);
-    return app.exec();
-}
-//------------------------------------------------------------------------------
+    Q_OBJECT
+    public:
 
+        SBMDIManager(QObject* pParent = nullptr);
+        ~SBMDIManager();
+
+    private:
+
+        struct Private;
+        /// A pointer to a private implementation.
+        Private* m_pPrivate;
+};//class SBMDIManager
+#endif // SBMDIMANAGER_H
 

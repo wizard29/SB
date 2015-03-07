@@ -3,9 +3,9 @@
 //==============================================================================
 //
 // Author:              $Author:$
-// Creation date:       2015.03.04
+// Creation date:       2015.03.07
 // Modification date:   $Date$
-// Module:              Application
+// Module:              Gui
 // Platform:            MS Windows 7, Linux, MAC OS X 10.6.x
 //
 //------------------------------------------------------------------------------
@@ -16,21 +16,24 @@
 
 
 //------------------------------------------------------------------------------
-#include <SBApplication.h>
+#ifndef SBMDIMANAGER_P_H
+#define SBMDIMANAGER_P_H
 
 
-//------------------------------------------------------------------------------
-/**
- * @brief The application entry point.
- * @param argc - an application argument count.
- * @param argv - an application argument list.
- * @return 0 if the application completes successfully.
- */
-int main(int argc, char** argv)
+#include "SBMDIManager.h"
+
+
+struct SBMDIManager::Private
 {
-    SBApplication app(argc, argv);
-    return app.exec();
-}
-//------------------------------------------------------------------------------
+    public:
 
+        Private(SBMDIManager* pHost);
+        ~Private();
+
+    public:
+
+        /// A pointer to a host object.
+        SBMDIManager* m_pHost;
+};//struct SBMDIManager::Private
+#endif // SBMDIMANAGER_P_H
 

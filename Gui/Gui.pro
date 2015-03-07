@@ -5,32 +5,33 @@ include (../general.pri)
 QT += widgets
 
 ################################################################################
-TARGET = sb
-TEMPLATE = app
+TARGET = gui
+TEMPLATE = lib
 
 ################################################################################
-DEFINES +=
+DEFINES += GUI_BUILD
 
 ################################################################################
 QMAKE_LIBDIR += \
-    ../Core/$$inputbin \
-    ../Gui/$$inputbin
-
-################################################################################
-INCLUDEPATH += \
-    ../Core/include \
-    ../Gui/include
-
-################################################################################
-HEADERS +=
-
-################################################################################
-SOURCES += \
-    src/main.cpp
+    ../Core/$$inputbin
 
 ################################################################################
 QMAKE_LIBS += \
-    -lcore \
-    -lgui
+    -lcore
+
+################################################################################
+HEADERS += \
+    include/guidef.h \
+    include/SBMDIManager.h \
+    src/private/SBMDIManager_p.h \
+    include/SBApplication.h \
+    src/private/SBApplication_p.h
+
+################################################################################
+SOURCES += \
+    src/SBMDIManager.cpp \
+    src/private/SBMDIManager_p.cpp \
+    src/private/SBApplication_p.cpp \
+    src/SBApplication.cpp
 
 ################################################################################

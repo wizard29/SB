@@ -3,9 +3,9 @@
 //==============================================================================
 //
 // Author:              $Author:$
-// Creation date:       2015.03.04
+// Creation date:       2015.03.07
 // Modification date:   $Date$
-// Module:              Application
+// Module:              Gui
 // Platform:            MS Windows 7, Linux, MAC OS X 10.6.x
 //
 //------------------------------------------------------------------------------
@@ -16,21 +16,31 @@
 
 
 //------------------------------------------------------------------------------
-#include <SBApplication.h>
+#ifndef GUIDEF_H
+#define GUIDEF_H
+
+
+#include <qglobal.h>
 
 
 //------------------------------------------------------------------------------
 /**
- * @brief The application entry point.
- * @param argc - an application argument count.
- * @param argv - an application argument list.
- * @return 0 if the application completes successfully.
+ * @defgroup Gui
+ * @brief The Gui module contains gui data structures, objects, managers and
+ * factories.
  */
-int main(int argc, char** argv)
-{
-    SBApplication app(argc, argv);
-    return app.exec();
-}
 //------------------------------------------------------------------------------
-
-
+#ifdef Q_OS_WIN
+#ifdef GUI_NODLL
+# define GUI_DEF
+#else
+# ifdef GUI_BUILD
+#    define GUI_DEF __declspec(dllexport)
+# else
+#    define GUI_DEF __declspec(dllimport)
+# endif
+#endif
+#else
+#  define GUI_DEF
+#endif
+#endif //GUIDEF_H

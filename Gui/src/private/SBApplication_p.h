@@ -3,9 +3,9 @@
 //==============================================================================
 //
 // Author:              $Author:$
-// Creation date:       2015.03.04
+// Creation date:       2015.03.07
 // Modification date:   $Date$
-// Module:              Application
+// Module:              Gui
 // Platform:            MS Windows 7, Linux, MAC OS X 10.6.x
 //
 //------------------------------------------------------------------------------
@@ -16,21 +16,29 @@
 
 
 //------------------------------------------------------------------------------
-#include <SBApplication.h>
+#ifndef SBAPPLICATION_P_H
+#define SBAPPLICATION_P_H
 
 
-//------------------------------------------------------------------------------
-/**
- * @brief The application entry point.
- * @param argc - an application argument count.
- * @param argv - an application argument list.
- * @return 0 if the application completes successfully.
- */
-int main(int argc, char** argv)
+#include "SBApplication.h"
+
+
+struct SBApplication::Private
 {
-    SBApplication app(argc, argv);
-    return app.exec();
-}
-//------------------------------------------------------------------------------
+    public:
 
+        Private(SBApplication*);
+        ~Private();
+        static bool MakeFolderStructure(const QString& path);
+
+    public:
+
+        /// A pointer to a host object.
+        SBApplication* m_pHost;
+        /// The application settings file name.
+        QString m_appDataFileName;
+        /// The user settings file name.
+        QString m_userDataFileName;
+};//struct SBApplication::Private
+#endif // SBAPPLICATION_P_H
 
