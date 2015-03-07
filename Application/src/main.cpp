@@ -17,6 +17,7 @@
 
 //------------------------------------------------------------------------------
 #include <SBApplication.h>
+#include <SBWidget.h>
 
 
 //------------------------------------------------------------------------------
@@ -28,7 +29,9 @@
  */
 int main(int argc, char** argv)
 {
-    SBApplication app(argc, argv);
+    SBApplication app(argc, argv);    
+    SBWidget widget;
+    widget.show();
     return app.exec();
 }
 //------------------------------------------------------------------------------
