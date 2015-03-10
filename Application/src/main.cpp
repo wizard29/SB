@@ -29,7 +29,8 @@
  */
 int main(int argc, char** argv)
 {
-    SBApplication app(argc, argv);    
+    SBApplication app(argc, argv);
+    app.LoadTheme();
     SBWidget widget;
     widget.show();
     return app.exec();

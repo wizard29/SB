@@ -29,6 +29,8 @@ struct SBApplication::Private
 
         Private(SBApplication*);
         ~Private();
+
+        void LoadStyle();
         static bool MakeFolderStructure(const QString& path);
 
     public:

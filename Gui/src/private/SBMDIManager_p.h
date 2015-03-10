@@ -30,10 +30,29 @@ struct SBMDIManager::Private
         Private(SBMDIManager* pHost);
         ~Private();
 
+        void Activate(QWidget* pWidget);
+        void ActivateNext();
+        void ActivatePrev();
+        void MovePanelsTo(QWidget* pWidget);
+        void Add(QWidget* pWidget);
+        void Remove(QWidget* pWidget);
+        void AddPanel(QWidget* pWidget);
+        void RemovePanel(QWidget* pWidget);
+
     public:
 
         /// A pointer to a host object.
         SBMDIManager* m_pHost;
+        /// List of managed widgets.
+        QList<QWidget*> m_widgets;
+        /// Set of managed widgets.
+        QSet<QWidget*> m_widgetSet;
+        /// List of managed panels.
+        QList<QWidget*> m_panels;
+        /// Set of managed panels.
+        QSet<QWidget*> m_paneltSet;
+        /// A pointer to current active widget.
+        QWidget* m_pActiveWidget;
 };//struct SBMDIManager::Private
 #endif // SBMDIMANAGER_P_H
 

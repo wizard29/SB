@@ -24,6 +24,9 @@
 #include <qobject.h>
 
 
+class QWidget;
+
+
 class GUI_DEF SBMDIManager
         : public QObject
 {
@@ -32,6 +35,28 @@ class GUI_DEF SBMDIManager
 
         SBMDIManager(QObject* pParent = nullptr);
         ~SBMDIManager();
+
+        QWidget* CreateMDIArea();
+        void Add(QWidget* pWidget);
+        void Remove(QWidget* pWidget);
+        QList<QWidget*> Widgets();
+        void AddPanel(QWidget* pWidget);
+        void RemovePanel(QWidget* pWidget);
+
+    public slots:
+
+        void Activate(QWidget* pWidget);
+        void ActivateNext();
+        void ActivatePrev();
+
+    signals:
+
+
+        void WidgetActivated(QWidget* pWidget);
+
+    protected:
+
+        bool eventFilter(QObject*, QEvent*);
 
     private:
 

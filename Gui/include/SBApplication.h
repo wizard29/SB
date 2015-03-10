@@ -42,6 +42,7 @@ class GUI_DEF SBApplication
 
     public:
 
+        static void LoadTheme();
         static SBApplication* GetInstance();
         static void SetDataFolder(const QString& absolutePath);
         static QString GetDataFolder();

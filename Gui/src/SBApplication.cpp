@@ -85,6 +85,24 @@ SBApplication* SBApplication::GetInstance()
 
 //------------------------------------------------------------------------------
 /**
+ * @brief Loads an application theme.
+ */
+void SBApplication::LoadTheme()
+{
+    QDir::addSearchPath(QString::fromLatin1("theme"),
+                        GetUserValue(QString::fromLatin1("theme"),
+                                     QString::fromLatin1(":/Dark")).toString());
+    // load style sheet
+    QFile file("theme:style.qss");
+    if (file.open(QFile::ReadOnly))
+    {
+        QString styleSheet = QLatin1String(file.readAll());
+        sbApp->setStyleSheet(styleSheet);
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
  * @brief Sets application data folder.
  * @param absolutePath - an application data folder.
  */

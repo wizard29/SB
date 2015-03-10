@@ -45,4 +45,109 @@ SBMDIManager::SBMDIManager(QObject* pParent)
 SBMDIManager::~SBMDIManager()
 {
 }
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Creates an MDI area widget.
+ * @return A pointer to an MDI area widget.
+ */
+QWidget* SBMDIManager::CreateMDIArea()
+{
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Adds a widget under the MDI manager control.
+ * @param pWidget - a pointer to a widget.
+ */
+void SBMDIManager::Add(QWidget* pWidget)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->Add(pWidget);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Removes a widget from the MDI manager control.
+ * @param pWidget - a pointer to a widget.
+ */
+void SBMDIManager::Remove(QWidget* pWidget)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->Remove(pWidget);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Returns a list of managed widgets.
+ */
+QList<QWidget*> SBMDIManager::Widgets()
+{
+    Q_ASSERT(m_pPrivate);
+    return m_pPrivate->m_widgets;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Adds a panel widget under MDI manager control.
+ * @param pWidget - a pointer to a panel widget.
+ */
+void SBMDIManager::AddPanel(QWidget* pWidget)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->AddPanel(pWidget);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Removes a panel from the MDI manager control.
+ * @param pWidget - a pointer to a panel widget.
+ */
+void SBMDIManager::RemovePanel(QWidget* pWidget)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->RemovePanel(pWidget);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Activates a controlled widget.
+ * @param pWidget - a pointer to a widget.
+ */
+void SBMDIManager::Activate(QWidget* pWidget)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->Activate(pWidget);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Activates next order widget.
+ */
+void SBMDIManager::ActivateNext()
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->ActivateNext();
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Activates previous order widget.
+ */
+void SBMDIManager::ActivatePrev()
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->ActivatePrev();
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Reimplemented method.
+ * @see The QObject::eventFilter for more details.
+ */
+bool SBMDIManager::eventFilter(QObject* pObject, QEvent* pEvent)
+{
+    return QObject::eventFilter(pObject, pEvent);
+}
 //------------------------------------------------------------------------------

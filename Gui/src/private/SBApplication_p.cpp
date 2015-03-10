@@ -35,7 +35,7 @@
 SBApplication::Private::Private(SBApplication* pHost)
     : m_pHost(pHost)
 {
-    Q_ASSERT(pHost);
+    Q_ASSERT(pHost);    
 }
 
 //------------------------------------------------------------------------------
