@@ -51,12 +51,20 @@ class GUI_DEF SBMDIManager
 
     signals:
 
-
+        /**
+         * @brief Emits when a managed widget has activated.
+         * @param pWidget - a pointer to the managed widget.
+         */
         void WidgetActivated(QWidget* pWidget);
 
     protected:
 
         bool eventFilter(QObject*, QEvent*);
+
+    private slots:
+
+        void OnDestroyed(QObject* pWidget);
+        void OnPanelDestroyed(QObject* pWidget);
 
     private:
 

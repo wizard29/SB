@@ -17,6 +17,7 @@
 
 //------------------------------------------------------------------------------
 #include "SBMDIManager_p.h"
+#include <qwidget.h>
 
 
 //------------------------------------------------------------------------------
@@ -85,7 +86,14 @@ void SBMDIManager::Remove(QWidget* pWidget)
 QList<QWidget*> SBMDIManager::Widgets()
 {
     Q_ASSERT(m_pPrivate);
-    return m_pPrivate->m_widgets;
+    QList<QWidget*> result;
+    auto cast = [](QObject* pObject)->QWidget*
+    {
+        return qobject_cast<QWidget*>(pObject);
+    };
+    std::transform(m_pPrivate->m_widgets.begin(),
+                   m_pPrivate->m_widgets.end(), std::back_inserter(result), cast);
+    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -148,6 +156,29 @@ void SBMDIManager::ActivatePrev()
  */
 bool SBMDIManager::eventFilter(QObject* pObject, QEvent* pEvent)
 {
-    return QObject::eventFilter(pObject, pEvent);
+    Q_ASSERT(m_pPrivate);
+    return m_pPrivate->eventFilter(pObject, pEvent);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Calls when a managed widget has destroyed.
+ * @param pObject - a pointer to the managed widget.
+ */
+void SBMDIManager::OnDestroyed(QObject* pObject)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->Destroyed(pObject);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Calls when a managed panel has destroyed.
+ * @param pObject - a pointer to the managed panel.
+ */
+void SBMDIManager::OnPanelDestroyed(QObject* pObject)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->PanelDestroyed(pObject);
 }
 //------------------------------------------------------------------------------

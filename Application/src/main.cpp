@@ -19,6 +19,9 @@
 #include <SBApplication.h>
 #include <SBWidget.h>
 
+#include <SBMDIManager.h>
+#include <qdockwidget.h>
+
 
 //------------------------------------------------------------------------------
 /**
@@ -31,8 +34,22 @@ int main(int argc, char** argv)
 {
     SBApplication app(argc, argv);
     app.LoadTheme();
-    SBWidget widget;
-    widget.show();
+    SBMDIManager man;
+
+    SBWidget widget1;
+    widget1.setWindowTitle("w1");
+    widget1.show();
+    SBWidget widget2;
+    widget2.setWindowTitle("w2");
+    widget2.show();
+    QDockWidget panel;
+    panel.setWindowTitle("panel");
+    panel.show();
+    panel.setFloating(true);
+
+    man.Add(&widget1);
+    man.Add(&widget2);
+    man.AddPanel(&panel);
     return app.exec();
 }
 //------------------------------------------------------------------------------

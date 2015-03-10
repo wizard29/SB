@@ -21,6 +21,7 @@
 
 
 #include "SBMDIManager.h"
+#include <qset.h>
 
 
 struct SBMDIManager::Private
@@ -38,21 +39,28 @@ struct SBMDIManager::Private
         void Remove(QWidget* pWidget);
         void AddPanel(QWidget* pWidget);
         void RemovePanel(QWidget* pWidget);
+        void Destroyed(QObject* pObject);
+        void PanelDestroyed(QObject* pObject);
+        bool eventFilter(QObject*, QEvent*);
+
+    private:
+
+        void Raise(QWidget* pWidget);
+        void Lower(QWidget* pWidget);
+        static void MovePanelToWidget(QWidget* pPanel, QWidget* pWidget);
 
     public:
 
         /// A pointer to a host object.
         SBMDIManager* m_pHost;
-        /// List of managed widgets.
-        QList<QWidget*> m_widgets;
+        /// Activation order of managed widgets.
+        QList<QObject*> m_widgets;
         /// Set of managed widgets.
-        QSet<QWidget*> m_widgetSet;
-        /// List of managed panels.
-        QList<QWidget*> m_panels;
+        QSet<QObject*> m_widgetSet;
         /// Set of managed panels.
-        QSet<QWidget*> m_paneltSet;
+        QSet<QObject*> m_panelSet;
         /// A pointer to current active widget.
-        QWidget* m_pActiveWidget;
+        QObject* m_pActiveWidget;
 };//struct SBMDIManager::Private
 #endif // SBMDIMANAGER_P_H
 
