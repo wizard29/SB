@@ -58,9 +58,10 @@ struct SBWidget::Private
 
     public:
 
-        Private(SBWidget* pHost);
+        Private(SBWidget* pHost, SBWidget::TitlePosition titlePos);        
         ~Private();
 
+        void Init();
         void InitDrag(const QPoint& pos);
         void StartDrag();
         void EndDrag();
@@ -93,6 +94,7 @@ struct SBWidget::Private
         void StopFadeTimer();
         void FadeCancel(bool fl);
         void SetTitleBarText(const QString&);
+        QRect GetTitleRectForDrag() const;
 
     public:
 
@@ -143,7 +145,9 @@ struct SBWidget::Private
         /// An opacity fade value.
         qreal m_fadeStep;
         /// An opacity intensify value.
-        qreal m_intensifyStep;        
+        qreal m_intensifyStep;
+        /// The title bar layout placement.
+        SBWidget::TitlePosition m_titlePos;
         /// The fade/intensify timer resolution value in milliseconds
         /// By default it is equal to 40 ms.
         static const int FADETIMERSTEP;

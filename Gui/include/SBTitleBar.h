@@ -46,6 +46,11 @@ class GUI_DEF SBTitleBar
         void AddWidget(QWidget* pWidget, Qt::Alignment align = Qt::AlignLeft);
         void SetContentsMargins(int, int, int, int);
 
+    public slots:
+
+        void SetTitleVisible(bool);
+        void SetIconVisible(bool);
+
     signals:
 
         /**

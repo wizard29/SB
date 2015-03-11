@@ -18,7 +18,8 @@
 //------------------------------------------------------------------------------
 #include "SBMDIManager_p.h"
 #include "SBApplication.h"
-#include <qwidget.h>
+#include <SBWidget.h>
+#include <SBPanel.h>
 #include <qevent.h>
 
 
@@ -55,18 +56,20 @@ SBMDIManager::Private::~Private()
  * @brief Activates a widget.
  * @param pWidget - a pointer to a managed widget.
  */
-void SBMDIManager::Private::Activate(QWidget* pWidget)
+void SBMDIManager::Private::Activate(SBWidget* pWidget)
 {
     QObject* pObject = qobject_cast<QObject*>(pWidget);
     if (m_pActiveWidget != pObject)
-    {
+    {        
         if (m_pActiveWidget)
         {
-            QWidget* pActiveWidget = qobject_cast<QWidget*>(m_pActiveWidget);
+            SBWidget* pActiveWidget = qobject_cast<SBWidget*>(m_pActiveWidget);
+            Q_ASSERT(pActiveWidget);
             pActiveWidget->overrideWindowState(pActiveWidget->windowState() &
                                                (~Qt::WindowActive));
             QWidget* pFocusWidget = SBApplication::focusWidget();
-            if (pFocusWidget && (pFocusWidget == pActiveWidget ||
+            if (pFocusWidget && (pFocusWidget ==
+                                 qobject_cast<QWidget*>(pActiveWidget) ||
                                  pActiveWidget->isAncestorOf(pFocusWidget)))
             {
                 pFocusWidget->clearFocus();
@@ -77,7 +80,7 @@ void SBMDIManager::Private::Activate(QWidget* pWidget)
         m_pActiveWidget = pObject;
         if (m_pActiveWidget)
         {
-            QWidget* pActiveWidget = pWidget;
+            SBWidget* pActiveWidget = pWidget;
             pActiveWidget->raise();
             pActiveWidget->overrideWindowState(pActiveWidget->windowState() |
                                                (Qt::WindowActive));
@@ -86,8 +89,7 @@ void SBMDIManager::Private::Activate(QWidget* pWidget)
 			{
 				MovePanelsTo(pWidget);
 			}
-
-        }        
+        }
         emit m_pHost->WidgetActivated(pWidget);
     }
 }
@@ -100,7 +102,7 @@ void SBMDIManager::Private::ActivateNext()
 {
     if (!m_widgets.isEmpty())
     {
-        QWidget* pWindow = qobject_cast<QWidget*>(m_widgets.last());
+        SBWidget* pWindow = qobject_cast<SBWidget*>(m_widgets.last());
         Q_ASSERT(pWindow);
         Activate(pWindow);
     }
@@ -114,32 +116,12 @@ void SBMDIManager::Private::ActivatePrev()
 {
     if (m_widgets.size() > 1)
     {
-        QWidget* pWindow = qobject_cast<QWidget*>(m_widgets[1]);
+        SBWidget* pWindow = qobject_cast<SBWidget*>(m_widgets[1]);
         Q_ASSERT(pWindow);
         Activate(pWindow);
-        pWindow = qobject_cast<QWidget*>(m_widgets[1]);
+        pWindow = qobject_cast<SBWidget*>(m_widgets[1]);
         Q_ASSERT(pWindow);
         Lower(pWindow);
-    }
-}
-
-//------------------------------------------------------------------------------
-/**
- * @brief Move all floating panels to a widget.
- * @param pWidget - a pointer to a widget.
- */
-void SBMDIManager::Private::MovePanelsTo(QWidget* pWidget)
-{
-    Q_ASSERT(pWidget);
-    Q_ASSERT(m_widgets.contains(qobject_cast<QObject*>(pWidget)));
-    // go through all panels
-    QSet<QObject*>::iterator pos = m_panelSet.begin();
-    QSet<QObject*>::iterator end = m_panelSet.end();
-    for (; pos != end; ++pos)
-    {
-        QWidget* pPanel = qobject_cast<QWidget*>(*pos);
-        Q_ASSERT(pPanel);
-        MovePanelToWidget(pPanel, pWidget);
     }
 }
 
@@ -148,7 +130,7 @@ void SBMDIManager::Private::MovePanelsTo(QWidget* pWidget)
  * @brief Adds a managed widget.
  * @param pWidget - a pointer to the widget.
  */
-void SBMDIManager::Private::Add(QWidget* pWidget)
+void SBMDIManager::Private::Add(SBWidget* pWidget)
 {
     Q_ASSERT(pWidget);
     QObject* pObject = qobject_cast<QObject*>(pWidget);
@@ -165,11 +147,33 @@ void SBMDIManager::Private::Add(QWidget* pWidget)
 
 //------------------------------------------------------------------------------
 /**
+ * @brief Adds a panel under control.
+ * @param pWidget - a pointer to the panel.
+ */
+void SBMDIManager::Private::Add(SBPanel* pWidget)
+{
+    Q_ASSERT(pWidget);
+    QObject* pObject = qobject_cast<QObject*>(pWidget);
+    if (!m_panelSet.contains(pObject))
+    {
+        m_panelSet.insert(pObject);
+        connect(pObject, SIGNAL(destroyed(QObject*)),
+                m_pHost, SLOT(OnPanelDestroyed(QObject*)));
+        if (m_pActiveWidget)
+        {
+            Q_ASSERT(qobject_cast<SBWidget*>(m_pActiveWidget));
+            MovePanelToWidget(pWidget, qobject_cast<SBWidget*>(m_pActiveWidget));
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
  * @brief Removes a managed widget.
  * @param pWidget - a pointer to the widget.
  * The managed widget removes from MDI manager control but not delete the widget.
  */
-void SBMDIManager::Private::Remove(QWidget* pWidget)
+void SBMDIManager::Private::Remove(SBWidget* pWidget)
 {
     Q_ASSERT(pWidget);
     QObject* pObject = qobject_cast<QObject*>(pWidget);
@@ -187,33 +191,11 @@ void SBMDIManager::Private::Remove(QWidget* pWidget)
 
 //------------------------------------------------------------------------------
 /**
- * @brief Adds a panel under control.
- * @param pWidget - a pointer to the panel.
- */
-void SBMDIManager::Private::AddPanel(QWidget* pWidget)
-{
-    Q_ASSERT(pWidget);
-    QObject* pObject = qobject_cast<QObject*>(pWidget);
-    if (!m_panelSet.contains(pObject))
-    {
-        m_panelSet.insert(pObject);
-        connect(pObject, SIGNAL(destroyed(QObject*)),
-                m_pHost, SLOT(OnPanelDestroyed(QObject*)));
-        if (m_pActiveWidget)
-        {
-            Q_ASSERT(qobject_cast<QWidget*>(m_pActiveWidget));
-            MovePanelToWidget(pWidget, qobject_cast<QWidget*>(m_pActiveWidget));
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-/**
  * @brief Removes a panel from control.
  * @param pWidget - a pointer to the panel.
  * This call removes parent widget of the panel but keeps window flags.
  */
-void SBMDIManager::Private::RemovePanel(QWidget* pWidget)
+void SBMDIManager::Private::Remove(SBPanel* pWidget)
 {
     Q_ASSERT(pWidget);
     QObject* pObject = qobject_cast<QObject*>(pWidget);
@@ -264,7 +246,7 @@ bool SBMDIManager::Private::eventFilter(QObject* pObject, QEvent* pEvent)
 {
     if (m_widgetSet.contains(pObject))
     {
-        QWidget* pWidget = qobject_cast<QWidget*>(pObject);
+        SBWidget* pWidget = qobject_cast<SBWidget*>(pObject);
         Q_ASSERT(pWidget);
         switch (pEvent->type())
         {
@@ -292,15 +274,44 @@ bool SBMDIManager::Private::eventFilter(QObject* pObject, QEvent* pEvent)
                 if (pWidget->isActiveWindow())
                 {
                     if (pObject != m_pActiveWidget)
-                    {
+                    {                        
                         Activate(pWidget);
                     }
+                    else
+                    {
+                        pWidget->overrideWindowState(pWidget->windowState() |
+                                                     (Qt::WindowActive));
+                    }
+                }
+                else
+                {
+                    pWidget->overrideWindowState(pWidget->windowState() &
+                                                 (~Qt::WindowActive));
                 }
             }
+                break;
+            case QEvent::Close:
+                Remove(pWidget);
                 break;
             default:
                 break;
 
+        }
+    }
+    else
+    {
+        SBApplication* pApp = qobject_cast<SBApplication*>(pObject);
+        if (pApp)
+        {
+            switch (pEvent->type())
+            {
+                case QEvent::ApplicationActivate:
+                    break;
+                case QEvent::ApplicationDeactivate:
+                    break;
+                default:
+                    break;
+            }
         }
     }
     return false;
@@ -311,11 +322,13 @@ bool SBMDIManager::Private::eventFilter(QObject* pObject, QEvent* pEvent)
  * @brief Raises a widget.
  * @param pWidget - the target widget.
  */
-void SBMDIManager::Private::Raise(QWidget* pWidget)
+void SBMDIManager::Private::Raise(SBWidget* pWidget)
 {
-    Q_ASSERT(m_widgets.contains(pWidget));
-    m_widgets.removeOne(pWidget);
-    m_widgets.push_front(pWidget);
+    QObject* pObject = qobject_cast<QObject*>(pWidget);
+    Q_ASSERT(pObject);
+    Q_ASSERT(m_widgets.contains(pObject));
+    m_widgets.removeOne(pObject);
+    m_widgets.push_front(pObject);
 }
 
 //------------------------------------------------------------------------------
@@ -323,11 +336,49 @@ void SBMDIManager::Private::Raise(QWidget* pWidget)
  * @brief Lowers a widget.
  * @param pWidget - the target widget.
  */
-void SBMDIManager::Private::Lower(QWidget* pWidget)
+void SBMDIManager::Private::Lower(SBWidget* pWidget)
 {
-    Q_ASSERT(m_widgets.contains(pWidget));
-    m_widgets.removeOne(pWidget);
-    m_widgets.push_back(pWidget);
+    QObject* pObject = qobject_cast<QObject*>(pWidget);
+    Q_ASSERT(pObject);
+    Q_ASSERT(m_widgets.contains(pObject));
+    m_widgets.removeOne(pObject);
+    m_widgets.push_back(pObject);
+}
+
+//------------------------------------------------------------------------------
+bool SBMDIManager::Private::HasVisibleTopLevel() const
+{
+    return static_cast<bool>(std::count_if(m_widgetSet.begin(), m_widgetSet.end(),
+                                           [](QObject* pObject)
+    {
+        QWidget* pWidget = qobject_cast<SBWidget*>(pObject);
+        Q_ASSERT(pWidget);
+        if (pWidget->windowFlags().testFlag(Qt::Window))
+        {
+            return static_cast<int>(pWidget->isVisible());
+        }
+        return 0;
+    }));
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Move all floating panels to a widget.
+ * @param pWidget - a pointer to a widget.
+ */
+void SBMDIManager::Private::MovePanelsTo(SBWidget* pWidget)
+{
+    Q_ASSERT(pWidget);
+    Q_ASSERT(m_widgets.contains(qobject_cast<QObject*>(pWidget)));
+    // go through all panels
+    QSet<QObject*>::iterator pos = m_panelSet.begin();
+    QSet<QObject*>::iterator end = m_panelSet.end();
+    for (; pos != end; ++pos)
+    {
+        SBPanel* pPanel = qobject_cast<SBPanel*>(*pos);
+        Q_ASSERT(pPanel);
+        MovePanelToWidget(pPanel, pWidget);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -336,9 +387,9 @@ void SBMDIManager::Private::Lower(QWidget* pWidget)
  * @param pPanel - a pointer to the source panel.
  * @param pWidget - a pointer to the target widget.
  */
-void SBMDIManager::Private::MovePanelToWidget(QWidget* pPanel, QWidget* pWidget)
+void SBMDIManager::Private::MovePanelToWidget(SBPanel* pPanel, SBWidget* pWidget)
 {
-    if (pPanel->property("floating").toBool())
+    if (pPanel->IsFloating())
     {
         bool visibility = pPanel->isVisible();
         Qt::WindowFlags f = pPanel->windowFlags();

@@ -32,6 +32,8 @@ class GUI_DEF SBWidget
         : public QWidget
 {
     Q_OBJECT
+    Q_ENUMS(TitlePosition)
+    Q_PROPERTY(TitlePosition TitlePos READ GetTitlePosition)
     public:
 
         enum FadeState
@@ -43,9 +45,18 @@ class GUI_DEF SBWidget
             FadeClose = 4
         };
 
+        enum TitlePosition
+        {
+            TopTitleBar = 0,
+            BottomTitleBar,
+            LeftTitleBar,
+            RightTitleBar
+        };
+
     public:
 
-        SBWidget(QWidget* pParent = nullptr, Qt::WindowFlags f = 0);
+        SBWidget(QWidget* pParent = nullptr, Qt::WindowFlags f = 0,
+                 TitlePosition titlePos = TopTitleBar);
         ~SBWidget();
 
         void SetFadeTime(int msec);
@@ -53,9 +64,11 @@ class GUI_DEF SBWidget
         void CancelFadeAction(bool visible);
         SBTitleBar* TitleBar();
         QWidget* Content();
+        bool IsAllowToClose();
+        TitlePosition GetTitlePosition();
         virtual void AddMinimizeButton();
         virtual void AddMaximizeButton();
-        virtual void AddRestoreButton();
+        virtual void AddRestoreButton();        
 
     public slots:
 
@@ -98,6 +111,7 @@ class GUI_DEF SBWidget
         virtual void ShowMinimizedImp();
         virtual void ShowNormalImp();
         virtual void ShowMaximizedImp();
+        virtual bool CanClose();
 
     private:
 

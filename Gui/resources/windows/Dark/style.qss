@@ -1505,25 +1505,29 @@ OPDockWidget .QWidget#OPDOCKWIDGETMAINCONTENT {
         background: rgb( 76,  76,  76);
 }
 
-OPDockWidget SBTitleBar {
+SBPanel SBTitleBar {
         min-height: 23px;
 }
 
-OPDockWidget SBTitleBar QLabel {
+SBPanel SBTitleBar QLabel {
         background: transparent;
         color: rgb(142, 142, 142);
         font-weight: normal;
         font-size: 12px;
 }
 
-OPDockWidget QListView#m_pStyles::item:selected {
+SBPanel QListView#m_pStyles::item:selected {
         background: rgb(255, 255, 255);
         border: none;
 }
 
-OPDockWidget QListView#m_pStyles::item:hover {
+SBPanel QListView#m_pStyles::item:hover {
         background: rgb(255, 255, 255);
         border: none;
+}
+
+SBToolBar SBTitleBar {
+        max-width: 10px;
 }
 
 /*============================================================================*/
@@ -1796,7 +1800,7 @@ OPToolBar QLabel {
         margin: 0px 2px 0px 2px;
 }
 
-OPToolBar QToolButton {
+SBToolBar QToolButton {
         min-height: 24px;
         max-height: 24px;
 	border: none;

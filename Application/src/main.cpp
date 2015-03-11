@@ -18,9 +18,11 @@
 //------------------------------------------------------------------------------
 #include <SBApplication.h>
 #include <SBWidget.h>
-
 #include <SBMDIManager.h>
-#include <qdockwidget.h>
+#include <SBPanel.h>
+#include <SBToolBar.h>
+
+#include <qtoolbutton.h>
 
 
 //------------------------------------------------------------------------------
@@ -36,20 +38,40 @@ int main(int argc, char** argv)
     app.LoadTheme();
     SBMDIManager man;
 
-    SBWidget widget1;
+    SBWidget widget1(nullptr);
     widget1.setWindowTitle("w1");
-    widget1.show();
+    widget1.AddMaximizeButton();
+    widget1.AddRestoreButton();
+    widget1.AddMinimizeButton();
+    widget1.show();    
     SBWidget widget2;
     widget2.setWindowTitle("w2");
-    widget2.show();
-    QDockWidget panel;
-    panel.setWindowTitle("panel");
-    panel.show();
-    panel.setFloating(true);
+    widget2.AddMaximizeButton();
+    widget2.AddRestoreButton();
+    widget2.AddMinimizeButton();
+    widget2.show();    
+
+    SBPanel panel1;
+    panel1.setWindowTitle("panel 1");
+    panel1.SetFloating(true);
+    panel1.setVisible(true);
+
+    SBToolBar toolBar1;
+    toolBar1.setWindowTitle("toolbar 1");
+    toolBar1.SetFloating(true);
+    toolBar1.setVisible(true);
 
     man.Add(&widget1);
     man.Add(&widget2);
-    man.AddPanel(&panel);
+    man.Add(&panel1);
+    man.Add(&toolBar1);
+
+    QToolButton* pBtn = new QToolButton;
+    pBtn->setIcon(QPixmap("theme:questionicon.png"));
+    toolBar1.Add(pBtn);
+    pBtn = new QToolButton;
+    pBtn->setIcon(QPixmap("theme:wariningicon.png"));
+    toolBar1.Add(pBtn);
     return app.exec();
 }
 //------------------------------------------------------------------------------

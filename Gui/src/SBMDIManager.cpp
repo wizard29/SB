@@ -17,7 +17,8 @@
 
 //------------------------------------------------------------------------------
 #include "SBMDIManager_p.h"
-#include <qwidget.h>
+#include <SBWidget.h>
+#include <SBPanel.h>
 
 
 //------------------------------------------------------------------------------
@@ -45,6 +46,8 @@ SBMDIManager::SBMDIManager(QObject* pParent)
  */
 SBMDIManager::~SBMDIManager()
 {
+    Q_ASSERT(m_pPrivate);
+    delete m_pPrivate;
 }
 
 //------------------------------------------------------------------------------
@@ -62,7 +65,18 @@ QWidget* SBMDIManager::CreateMDIArea()
  * @brief Adds a widget under the MDI manager control.
  * @param pWidget - a pointer to a widget.
  */
-void SBMDIManager::Add(QWidget* pWidget)
+void SBMDIManager::Add(SBWidget* pWidget)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->Add(pWidget);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Adds a panel widget under MDI manager control.
+ * @param pWidget - a pointer to a panel widget.
+ */
+void SBMDIManager::Add(SBPanel* pWidget)
 {
     Q_ASSERT(m_pPrivate);
     m_pPrivate->Add(pWidget);
@@ -73,7 +87,18 @@ void SBMDIManager::Add(QWidget* pWidget)
  * @brief Removes a widget from the MDI manager control.
  * @param pWidget - a pointer to a widget.
  */
-void SBMDIManager::Remove(QWidget* pWidget)
+void SBMDIManager::Remove(SBWidget* pWidget)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->Remove(pWidget);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Removes a panel from the MDI manager control.
+ * @param pWidget - a pointer to a panel widget.
+ */
+void SBMDIManager::Remove(SBPanel* pWidget)
 {
     Q_ASSERT(m_pPrivate);
     m_pPrivate->Remove(pWidget);
@@ -83,13 +108,13 @@ void SBMDIManager::Remove(QWidget* pWidget)
 /**
  * @brief Returns a list of managed widgets.
  */
-QList<QWidget*> SBMDIManager::Widgets()
+QList<SBWidget*> SBMDIManager::Widgets()
 {
     Q_ASSERT(m_pPrivate);
-    QList<QWidget*> result;
-    auto cast = [](QObject* pObject)->QWidget*
+    QList<SBWidget*> result;
+    auto cast = [](QObject* pObject)->SBWidget*
     {
-        return qobject_cast<QWidget*>(pObject);
+        return qobject_cast<SBWidget*>(pObject);
     };
     std::transform(m_pPrivate->m_widgets.begin(),
                    m_pPrivate->m_widgets.end(), std::back_inserter(result), cast);
@@ -98,32 +123,10 @@ QList<QWidget*> SBMDIManager::Widgets()
 
 //------------------------------------------------------------------------------
 /**
- * @brief Adds a panel widget under MDI manager control.
- * @param pWidget - a pointer to a panel widget.
- */
-void SBMDIManager::AddPanel(QWidget* pWidget)
-{
-    Q_ASSERT(m_pPrivate);
-    m_pPrivate->AddPanel(pWidget);
-}
-
-//------------------------------------------------------------------------------
-/**
- * @brief Removes a panel from the MDI manager control.
- * @param pWidget - a pointer to a panel widget.
- */
-void SBMDIManager::RemovePanel(QWidget* pWidget)
-{
-    Q_ASSERT(m_pPrivate);
-    m_pPrivate->RemovePanel(pWidget);
-}
-
-//------------------------------------------------------------------------------
-/**
  * @brief Activates a controlled widget.
  * @param pWidget - a pointer to a widget.
  */
-void SBMDIManager::Activate(QWidget* pWidget)
+void SBMDIManager::Activate(SBWidget* pWidget)
 {
     Q_ASSERT(m_pPrivate);
     m_pPrivate->Activate(pWidget);

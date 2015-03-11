@@ -39,11 +39,13 @@
 /**
  * @brief Constructor.
  */
-SBWidget::SBWidget(QWidget* pParent, Qt::WindowFlags f)
+SBWidget::SBWidget(QWidget* pParent, Qt::WindowFlags f, TitlePosition titlePos)
     : QWidget(pParent, f | Qt::CustomizeWindowHint | Qt::FramelessWindowHint)
     , m_pPrivate(nullptr)
-{
-    m_pPrivate = new Private(this);
+{    
+    m_pPrivate = new Private(this, titlePos);
+    // this call need to avoid style sheet requests
+    m_pPrivate->Init();
 }
 
 //------------------------------------------------------------------------------
@@ -98,6 +100,7 @@ void SBWidget::CancelFadeAction(bool visible)
  */
 SBTitleBar* SBWidget::TitleBar()
 {
+    Q_ASSERT(m_pPrivate);
     return m_pPrivate->m_pTitleBar;
 }
 
@@ -107,7 +110,28 @@ SBTitleBar* SBWidget::TitleBar()
  */
 QWidget* SBWidget::Content()
 {
+    Q_ASSERT(m_pPrivate);
     return m_pPrivate->m_pContent;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Returns true if the widget can be closed.
+ * The implementation of the close request must be located in the CanClose method.
+ */
+bool SBWidget::IsAllowToClose()
+{
+    return CanClose();
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Returns widget's title bar position.
+ */
+SBWidget::TitlePosition SBWidget::GetTitlePosition()
+{
+    Q_ASSERT(m_pPrivate);
+    return m_pPrivate->m_titlePos;
 }
 
 //------------------------------------------------------------------------------
@@ -170,11 +194,10 @@ void SBWidget::mousePressEvent(QMouseEvent* pEvent)
 {
     if (pEvent->button() == Qt::LeftButton && !isMaximized() && !isMinimized())
     {
+        Q_ASSERT(m_pPrivate);
         QPoint pos = m_pPrivate->m_pTitleBar->mapFrom(this, pEvent->pos());
-        QRect titleRect = m_pPrivate->m_pTitleBar->rect()
-                .adjusted(m_pPrivate->BorderWidthLeft() + 1, m_pPrivate->BorderWidthTop() + 1,
-                          -m_pPrivate->BorderWidthRight() - 1, 0);
-        if (titleRect.contains(pos) && !m_pPrivate->m_ignoreMoveFromTitle)
+        QRect titleRect = m_pPrivate->GetTitleRectForDrag();
+        if (titleRect.contains(pos))
         {
             m_pPrivate->InitDrag(pEvent->pos());
             return;
@@ -194,6 +217,7 @@ void SBWidget::mousePressEvent(QMouseEvent* pEvent)
  */
 void SBWidget::mouseMoveEvent(QMouseEvent* pEvent)
 {
+    Q_ASSERT(m_pPrivate);
     if (m_pPrivate->m_dragState && !m_pPrivate->m_drag)
     {
         m_pPrivate->StartDrag();
@@ -214,6 +238,7 @@ void SBWidget::mouseReleaseEvent(QMouseEvent* pEvent)
 {
     if (pEvent->button() == Qt::LeftButton)
     {
+        Q_ASSERT(m_pPrivate);
         if (m_pPrivate->m_dragState)
         {
             m_pPrivate->EndDrag();
@@ -276,6 +301,7 @@ void SBWidget::closeEvent(QCloseEvent* pEvent)
  */
 void SBWidget::timerEvent(QTimerEvent* pEvent)
 {
+    Q_ASSERT(m_pPrivate);
     if (pEvent->timerId() == m_pPrivate->m_fadeTimerID)
     {
         switch(m_pPrivate->m_fadeState)
@@ -305,6 +331,7 @@ void SBWidget::timerEvent(QTimerEvent* pEvent)
  */
 bool SBWidget::eventFilter(QObject* pObject, QEvent* pEvent)
 {
+    Q_ASSERT(m_pPrivate);
     if (pObject == qobject_cast<QObject*>(m_pPrivate->m_pWidget))
     {
         switch (pEvent->type())
@@ -372,6 +399,13 @@ bool SBWidget::eventFilter(QObject* pObject, QEvent* pEvent)
             case QEvent::WindowTitleChange:
                 m_pPrivate->SetTitleBarText(windowTitle());
                 break;
+            case QEvent::Close:
+                if (!IsAllowToClose())
+                {
+                    pEvent->ignore();
+                    return true;
+                }
+                break;
             default:
                 break;
         }
@@ -422,6 +456,7 @@ bool SBWidget::eventFilter(QObject* pObject, QEvent* pEvent)
  */
 void SBWidget::ReplaceContent(QWidget* pNewContent)
 {
+    Q_ASSERT(m_pPrivate);
     if (m_pPrivate->m_pContent != pNewContent)
     {
         QGridLayout* pGrid = qobject_cast<QGridLayout*>(m_pPrivate->m_pWidget->layout());
@@ -449,6 +484,7 @@ void SBWidget::ReplaceContent(QWidget* pNewContent)
  */
 void SBWidget::SetMainContentMargins(int left, int top, int right, int bottom)
 {
+    Q_ASSERT(m_pPrivate);
     QGridLayout* pGrid = qobject_cast<QGridLayout*>(
                 m_pPrivate->m_pWidget->layout());
     Q_ASSERT(pGrid);
@@ -474,6 +510,7 @@ void SBWidget::RestoreMainContentMargins()
  */
 void SBWidget::IgnoreTitleMove(bool fl)
 {
+    Q_ASSERT(m_pPrivate);
     m_pPrivate->m_ignoreMoveFromTitle = fl;
 }
 
@@ -484,6 +521,7 @@ void SBWidget::IgnoreTitleMove(bool fl)
  */
 void SBWidget::IgnoreResize(bool fl)
 {
+    Q_ASSERT(m_pPrivate);
     m_pPrivate->m_ignoreResize = fl;
 }
 
@@ -493,6 +531,7 @@ void SBWidget::IgnoreResize(bool fl)
  */
 QToolButton* SBWidget::CloseButton()
 {
+    Q_ASSERT(m_pPrivate);
     return m_pPrivate->m_pCloseBtn;
 }
 
@@ -502,6 +541,7 @@ QToolButton* SBWidget::CloseButton()
  */
 QToolButton* SBWidget::MinimizeButton()
 {
+    Q_ASSERT(m_pPrivate);
     return m_pPrivate->m_pMinimizedBtn;
 }
 
@@ -511,6 +551,7 @@ QToolButton* SBWidget::MinimizeButton()
  */
 QToolButton* SBWidget::RestoreButton()
 {
+    Q_ASSERT(m_pPrivate);
     return m_pPrivate->m_pRestoreBtn;
 }
 
@@ -520,6 +561,7 @@ QToolButton* SBWidget::RestoreButton()
  */
 QToolButton* SBWidget::MaximizeButton()
 {
+    Q_ASSERT(m_pPrivate);
     return m_pPrivate->m_pMaximizedBtn;
 }
 
@@ -608,5 +650,14 @@ void SBWidget::ShowNormalImp()
 void SBWidget::ShowMaximizedImp()
 {
     showMaximized();
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief The default implementation always returns true.
+ */
+bool SBWidget::CanClose()
+{
+    return true;
 }
 //------------------------------------------------------------------------------

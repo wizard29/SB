@@ -247,6 +247,26 @@ void SBTitleBar::SetContentsMargins(int left, int top, int right, int bottom)
 
 //------------------------------------------------------------------------------
 /**
+ * @brief Shows/hides title bar label.
+ */
+void SBTitleBar::SetTitleVisible(bool state)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->m_pText->setVisible(state);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Shows/hides title bar icon.
+ */
+void SBTitleBar::SetIconVisible(bool state)
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->m_pIcon->setVisible(state);
+}
+
+//------------------------------------------------------------------------------
+/**
  * @brief Double click event handler.
  * @see QWidget::mouseDoubleClickEvent for more details.
  */

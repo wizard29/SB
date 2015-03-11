@@ -24,7 +24,8 @@
 #include <qobject.h>
 
 
-class QWidget;
+class SBWidget;
+class SBPanel;
 
 
 class GUI_DEF SBMDIManager
@@ -37,15 +38,15 @@ class GUI_DEF SBMDIManager
         ~SBMDIManager();
 
         QWidget* CreateMDIArea();
-        void Add(QWidget* pWidget);
-        void Remove(QWidget* pWidget);
-        QList<QWidget*> Widgets();
-        void AddPanel(QWidget* pWidget);
-        void RemovePanel(QWidget* pWidget);
+        void Add(SBWidget* pWidget);
+        void Add(SBPanel* pWidget);
+        void Remove(SBWidget* pWidget);
+        void Remove(SBPanel* pWidget);
+        QList<SBWidget*> Widgets();
 
     public slots:
 
-        void Activate(QWidget* pWidget);
+        void Activate(SBWidget* pWidget);
         void ActivateNext();
         void ActivatePrev();
 
@@ -55,7 +56,7 @@ class GUI_DEF SBMDIManager
          * @brief Emits when a managed widget has activated.
          * @param pWidget - a pointer to the managed widget.
          */
-        void WidgetActivated(QWidget* pWidget);
+        void WidgetActivated(SBWidget* pWidget);
 
     protected:
 

@@ -31,23 +31,24 @@ struct SBMDIManager::Private
         Private(SBMDIManager* pHost);
         ~Private();
 
-        void Activate(QWidget* pWidget);
+        void Activate(SBWidget* pWidget);
         void ActivateNext();
-        void ActivatePrev();
-        void MovePanelsTo(QWidget* pWidget);
-        void Add(QWidget* pWidget);
-        void Remove(QWidget* pWidget);
-        void AddPanel(QWidget* pWidget);
-        void RemovePanel(QWidget* pWidget);
+        void ActivatePrev();        
+        void Add(SBWidget* pWidget);
+        void Add(SBPanel* pWidget);
+        void Remove(SBWidget* pWidget);
+        void Remove(SBPanel* pWidget);
         void Destroyed(QObject* pObject);
         void PanelDestroyed(QObject* pObject);
         bool eventFilter(QObject*, QEvent*);
 
     private:
 
-        void Raise(QWidget* pWidget);
-        void Lower(QWidget* pWidget);
-        static void MovePanelToWidget(QWidget* pPanel, QWidget* pWidget);
+        void Raise(SBWidget* pWidget);
+        void Lower(SBWidget* pWidget);
+        bool HasVisibleTopLevel() const;
+        void MovePanelsTo(SBWidget* pWidget);
+        static void MovePanelToWidget(SBPanel* pPanel, SBWidget* pWidget);
 
     public:
 

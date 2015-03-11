@@ -33,8 +33,9 @@ const QMargins SBWidget::Private::BORDERMARGINS = QMargins(3, 0, 3, 3);
 /**
  * @brief Constructor.
  * @param pHost - a pointer to a host object. Must not be a null pointer.
+ * @param titlePos - a title bar position.
  */
-SBWidget::Private::Private(SBWidget* pHost)
+SBWidget::Private::Private(SBWidget* pHost, SBWidget::TitlePosition titlePos)
     : m_pHost(pHost)
     , m_pTitleBar(nullptr)
     , m_pContent(nullptr)
@@ -59,6 +60,15 @@ SBWidget::Private::Private(SBWidget* pHost)
     , m_intensifyTime(0)
     , m_fadeStep(1.0)
     , m_intensifyStep(1.0)
+    , m_titlePos(titlePos)
+{
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Creates a widget's content.
+ */
+void SBWidget::Private::Init()
 {
     Q_ASSERT(m_pHost);
 #ifdef Q_OS_MACX
@@ -66,21 +76,28 @@ SBWidget::Private::Private(SBWidget* pHost)
 #else
     m_pHost->setAttribute(Qt::WA_TranslucentBackground);
 #endif
-    QGridLayout* pGrid = new QGridLayout(m_pHost);
-    pGrid->setSpacing(0);
-    pGrid->setMargin(0);
+    QGridLayout* pMainGrid = new QGridLayout(m_pHost);
+    pMainGrid->setSpacing(0);
+    pMainGrid->setMargin(0);
     m_pHost->setMouseTracking(true);
     m_pTitleBar = new SBTitleBar(m_pHost);
     m_pTitleBar->setCursor(Qt::ArrowCursor);
-    m_pTitleBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+    switch (m_titlePos)
+    {
+        case SBWidget::TopTitleBar:
+        case SBWidget::BottomTitleBar:
+            m_pTitleBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+            break;
+        case SBWidget::LeftTitleBar:
+        case SBWidget::RightTitleBar:
+            m_pTitleBar->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+            break;
+    }
     m_pTitleBar->setMouseTracking(true);
-    m_pTitleBar->installEventFilter(m_pHost);
-    pGrid->addWidget(m_pTitleBar, 0, 0);    
     m_pWidget = new QWidget(m_pHost);
     m_pWidget->setObjectName("WIDGETMAINCONTENT");
     m_pWidget->setCursor(Qt::ArrowCursor);
-    pGrid->addWidget(m_pWidget, 1, 0);
-    pGrid = new QGridLayout(m_pWidget);    
+    QGridLayout* pGrid = new QGridLayout(m_pWidget);
     pGrid->setContentsMargins(BORDERMARGINS);
     m_pContent = new QWidget(m_pWidget);
     m_pContent->setObjectName("WIDGETCONTENT");
@@ -88,13 +105,33 @@ SBWidget::Private::Private(SBWidget* pHost)
     pGrid->addWidget(m_pContent, 0, 0);
     m_pContent->setAutoFillBackground(true);
     m_pContent->setCursor(Qt::ArrowCursor);
-    m_pContent->installEventFilter(m_pHost);
     m_pWidget->setAutoFillBackground(true);
     m_pWidget->setMouseTracking(true);
-    m_pWidget->installEventFilter(m_pHost);
     SetupTitleBar();
-    m_pHost->installEventFilter(m_pHost);
     m_pHost->setWindowOpacity(0.0);
+    switch (m_titlePos)
+    {
+        case SBWidget::TopTitleBar:
+            pMainGrid->addWidget(m_pTitleBar, 0, 0);
+            pMainGrid->addWidget(m_pWidget, 1, 0);
+            break;
+        case SBWidget::BottomTitleBar:
+            pMainGrid->addWidget(m_pWidget, 0, 0);
+            pMainGrid->addWidget(m_pTitleBar, 1, 0);
+            break;
+        case SBWidget::LeftTitleBar:
+            pMainGrid->addWidget(m_pTitleBar, 0, 0);
+            pMainGrid->addWidget(m_pWidget, 0, 1);
+            break;
+        case SBWidget::RightTitleBar:
+            pMainGrid->addWidget(m_pWidget, 0, 0);
+            pMainGrid->addWidget(m_pTitleBar, 0, 1);
+            break;
+    }
+    m_pTitleBar->installEventFilter(m_pHost);
+    m_pContent->installEventFilter(m_pHost);
+    m_pWidget->installEventFilter(m_pHost);
+    m_pHost->installEventFilter(m_pHost);
 }
 
 //------------------------------------------------------------------------------
@@ -819,5 +856,54 @@ void SBWidget::Private::FadeCancel(bool fl)
 void SBWidget::Private::SetTitleBarText(const QString& title)
 {
     m_pTitleBar->SetTitle(title);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Returns title rectangle for drag operations.
+ */
+QRect SBWidget::Private::GetTitleRectForDrag() const
+{
+    QRect result(0, 0, -1, -1);
+    if (!m_ignoreMoveFromTitle)
+    {
+        if (m_ignoreResize)
+        {
+            result = m_pTitleBar->rect();
+        }
+        else
+        {
+            switch (m_titlePos)
+            {
+                case SBWidget::TopTitleBar:
+                    result = m_pTitleBar->rect()
+                            .adjusted(BorderWidthLeft() + 1,
+                                      BorderWidthTop() + 1,
+                                      -BorderWidthRight() - 1, 0);
+                    break;
+                case SBWidget::BottomTitleBar:
+                    result = m_pTitleBar->rect()
+                            .adjusted(BorderWidthLeft() + 1,
+                                      0, -BorderWidthRight() - 1,
+                                      -BorderWidthBottom() - 1);
+                    break;
+                case SBWidget::LeftTitleBar:
+                    result = m_pTitleBar->rect()
+                            .adjusted(BorderWidthLeft() + 1,
+                                      BorderWidthTop() + 1,
+                                      0,
+                                      -BorderWidthBottom() - 1);
+                    break;
+                case SBWidget::RightTitleBar:
+                    result = m_pTitleBar->rect()
+                            .adjusted(0,
+                                      BorderWidthTop() + 1,
+                                      -BorderWidthRight() - 1,
+                                      -BorderWidthBottom() - 1);
+                    break;
+            }
+        }
+    }
+    return result;
 }
 //------------------------------------------------------------------------------
