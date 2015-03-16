@@ -17,8 +17,9 @@
 
 //------------------------------------------------------------------------------
 #include "SBToolBar_p.h"
-#include "SBToolBarContent.h"
+#include "SBToolBarContent_p.h"
 #include <SBTitleBar.h>
+#include <qlayout.h>
 #include <qtoolbutton.h>
 
 
@@ -49,8 +50,8 @@ SBToolBar::Private::Private(SBToolBar* pHost)
         pTitle->SetIconVisible(false);
     }
     m_pHost->IgnoreResize(true);
-    m_pHost->ReplaceContent(new SBToolBarContent(m_pHost));
-    m_pHost->resize(m_pHost->sizeHint());
+    m_pContent = new SBToolBarContentWidget(m_pHost);
+    m_pHost->ReplaceContent(m_pContent);    
 }
 
 //------------------------------------------------------------------------------
@@ -62,8 +63,24 @@ SBToolBar::Private::~Private()
 }
 
 //------------------------------------------------------------------------------
-void SBToolBar::Private::Add(QWidget* pWidget)
+/**
+ * @brief Fits toolbar to the best size.
+ */
+void SBToolBar::Private::FitToBestSize()
 {
-    Q_UNUSED(pWidget);
+    if (m_pHost->windowFlags().testFlag(Qt::Window))
+    {
+        Q_ASSERT(m_pContent);
+        QSize size = m_pContent->GetBestSize();
+        SBTitleBar* pTitle = m_pHost->TitleBar();
+        if (pTitle)
+        {
+            QSize titleBestSize = pTitle->sizeHint();
+            int width = titleBestSize.width() + size.width();
+            int height = qMax(titleBestSize.height(), size.height());
+            m_pHost->resize(width, height);
+        }
+        m_pHost->resize(size.width(), size.height());
+    }
 }
 //------------------------------------------------------------------------------

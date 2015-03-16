@@ -17,6 +17,7 @@
 
 //------------------------------------------------------------------------------
 #include "SBToolBar_p.h"
+#include "SBToolBarContent_p.h"
 
 
 //------------------------------------------------------------------------------
@@ -48,9 +49,23 @@ SBToolBar::~SBToolBar()
 }
 
 //------------------------------------------------------------------------------
-void SBToolBar::Add(QWidget* pWidget)
+/**
+ * @brief Returns a pointer to the managed content part.
+ */
+QWidget* SBToolBar::GetManagetContent()
 {
     Q_ASSERT(m_pPrivate);
-    m_pPrivate->Add(pWidget);
+    Q_ASSERT(m_pPrivate->m_pContent);
+    return m_pPrivate->m_pContent->GetContent();
+}
+
+//------------------------------------------------------------------------------
+/**
+ * @brief Fits toolbar to the best size.
+ */
+void SBToolBar::FitToBestSize()
+{
+    Q_ASSERT(m_pPrivate);
+    m_pPrivate->FitToBestSize();
 }
 //------------------------------------------------------------------------------

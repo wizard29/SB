@@ -32,7 +32,11 @@ class GUI_DEF SBToolBar
         SBToolBar(QWidget* pParent = nullptr);
         ~SBToolBar();
 
-        void Add(QWidget* pWidget);
+        QWidget* GetManagetContent();
+
+    public slots:
+
+        void FitToBestSize();
 
     private:
 

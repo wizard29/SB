@@ -20,20 +20,50 @@
 #define SBTOOLBARCONTENT_P_H
 
 
-#include "SBToolBarContent.h"
+#include <qwidget.h>
 
 
-struct SBToolBarContent::Private
+class QLabel;
+
+
+class SBToolBarContentWidget
+        : public QWidget
 {
+    Q_OBJECT
     public:
 
-        Private(SBToolBarContent* pHost);
-        ~Private();
+        SBToolBarContentWidget(QWidget* pParent);
+        ~SBToolBarContentWidget();
 
-    public:
+        QWidget* GetContent();
+        QSize GetBestSize() const;
 
-        /// A pointer to the host widget.
-        SBToolBarContent* m_pHost;
-};//struct SBToolBarContent::private
+    protected:
+
+        bool eventFilter(QObject*, QEvent*);
+        void resizeEvent(QResizeEvent* pEvent);
+        void contentChildEvent(QChildEvent* pEvent);
+        void showEvent(QShowEvent* pEvent);
+
+    private:
+
+        void ManageContentLayout(const QSize& newSize);
+        QSize GetMinimumSizeHint();
+        QSize GetExpandSizeHint() const;
+        bool Shrink(int width, int maxWidth);
+        bool Expand(int width, int maxWidth);
+        static int GetMinimumWidth(QWidget* pWidget);
+        static QSize GetBestWidgetSize(QWidget* pWidget);
+
+    private:
+
+        /// A pointer to the managed content.
+        QWidget* m_pContent;
+        /// A pointer to the expand label.
+        QLabel* m_pExpand;
+        /// Sets inside the ManageLayout function to prevents processing events
+        /// into the eventFilter call.
+        bool m_managed;
+};// class SBToolBarContentWidget
 #endif // SBTOOLBARCONTENT_P_H
 

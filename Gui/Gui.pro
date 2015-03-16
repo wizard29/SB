@@ -34,7 +34,6 @@ HEADERS += \
     src/private/SBPanel_p.h \
     include/SBToolBar.h \
     src/private/SBToolBar_p.h \
-    include/SBToolBarContent.h \
     src/private/SBToolBarContent_p.h
 
 ################################################################################
@@ -51,7 +50,6 @@ SOURCES += \
     src/private/SBPanel_p.cpp \
     src/SBToolBar.cpp \
     src/private/SBToolBar_p.cpp \
-    src/SBToolBarContent.cpp \
     src/private/SBToolBarContent_p.cpp
 
 ################################################################################

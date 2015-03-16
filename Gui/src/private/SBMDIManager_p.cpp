@@ -313,7 +313,7 @@ bool SBMDIManager::Private::eventFilter(QObject* pObject, QEvent* pEvent)
                     break;
             }
         }
-    }
+    }    
     return false;
 }
 

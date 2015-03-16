@@ -22,7 +22,7 @@
 #include <SBPanel.h>
 #include <SBToolBar.h>
 
-#include <qtoolbutton.h>
+#include "ui_toolbar.h"
 
 
 //------------------------------------------------------------------------------
@@ -66,12 +66,9 @@ int main(int argc, char** argv)
     man.Add(&panel1);
     man.Add(&toolBar1);
 
-    QToolButton* pBtn = new QToolButton;
-    pBtn->setIcon(QPixmap("theme:questionicon.png"));
-    toolBar1.Add(pBtn);
-    pBtn = new QToolButton;
-    pBtn->setIcon(QPixmap("theme:wariningicon.png"));
-    toolBar1.Add(pBtn);
+    Ui::ToolBar ui;
+    ui.setupUi(toolBar1.GetManagetContent());
+    toolBar1.FitToBestSize();
     return app.exec();
 }
 //------------------------------------------------------------------------------

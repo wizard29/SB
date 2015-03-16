@@ -23,6 +23,9 @@
 #include "SBToolBar.h"
 
 
+class SBToolBarContentWidget;
+
+
 struct SBToolBar::Private
 {
     public:
@@ -30,12 +33,14 @@ struct SBToolBar::Private
         Private(SBToolBar* pHost);
         ~Private();
 
-        void Add(QWidget* pWidget);
+        void FitToBestSize();
 
     public:
 
         /// A pointer to the host widget.
         SBToolBar* m_pHost;
+        /// A pointer to the toolbar content.
+        SBToolBarContentWidget* m_pContent;
 };//struct SBToolBar::Private
 #endif // SBTOOLBAR_P_H
 
